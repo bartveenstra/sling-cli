@@ -711,20 +711,21 @@ func (conn *MsSQLServerConn) CopyViaAzure(tableFName string, df *iop.Dataflow) (
 		return
 	}
 
+	sanitizedTableFName := strings.ReplaceAll(strings.ReplaceAll(tableFName, ".", "-"), `"`, "")
 	azPath := fmt.Sprintf(
 		"https://%s.blob.core.windows.net/%s/%s-%s",
 		conn.GetProp("AZURE_ACCOUNT"),
 		conn.GetProp("AZURE_CONTAINER"),
 		tempCloudStorageFolder,
-		tableFName,
+		sanitizedTableFName,
 	)
 
 	azFs, err := filesys.NewFileSysClient(dbio.TypeFileAzure, conn.PropArr()...)
 	if err != nil {
-		err = g.Error(err, "Could not get fs client for S3")
+		err = g.Error(err, "Could not get fs client for Azure")
 		return
 	}
-
+	g.Debug("azPath: " + azPath)
 	err = filesys.Delete(azFs, azPath+"*")
 	if err != nil {
 		return count, g.Error(err, "Could not Delete: "+azPath)
@@ -804,6 +805,7 @@ func (conn *MsSQLServerConn) CopyFromAzure(tableFName, azPath string) (count uin
 
 	g.Info("copying into azure DWH")
 	g.Debug("url: " + azPath)
+	g.Debug("sql: " + sql)
 	_, err = conn.Exec(sql)
 	if err != nil {
 		conn.SetProp("azToken", azToken)

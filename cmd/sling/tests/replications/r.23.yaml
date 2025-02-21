@@ -1,0 +1,25 @@
+source: MSSQL
+target: FABRIC_SQL
+defaults:
+  object: '{target_schema}.{stream_schema}_{stream_table}'
+  mode: full-refresh
+  target_options:
+    adjust_column_types: true
+    table_ddl: |
+      CREATE OR ALTER TABLE "dbo"."legal_entity"
+        (
+        [id] VARCHAR(MAX) NOT NULL,
+        [external_id] VARCHAR(MAX),
+        [name] VARCHAR(MAX),
+        [type] VARCHAR(MAX),
+        [customer_category] VARCHAR(MAX)
+        )
+streams:
+  dbo.legal_entity:
+    object: dbo.legal_entity
+
+env:
+  SLING_ALLOW_EMPTY: FALSE
+  SLING_LOGGING: JSON
+  start_time: ${START_TIME} # ${START_TIME} # From environment example: '2024-09-17 01:00:00.000'
+  end_time: ${END_TIME} # From environment example: '2024-09-17 01:59:59.999'

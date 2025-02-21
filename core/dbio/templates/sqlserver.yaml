@@ -41,6 +41,24 @@ core:
       FORMAT = 'CSV',
       FIELDTERMINATOR = ','
     )
+  copy_from_azure: |
+    COPY INTO {table} 
+    from '{azure_path}'
+    WITH (
+      FILE_TYPE = 'CSV',
+      FIELDQUOTE = '"',
+      FIELDTERMINATOR = ',',
+      ROWTERMINATOR = '0X0A',
+      FIRSTROW = 2,
+      MAXERRORS = 0,
+      DATEFORMAT = '{date_format}',
+      ENCODING = 'UTF8',
+      CREDENTIAL = (
+        IDENTITY = 'Shared Access Signature',
+        SECRET = '{azure_sas_token}'
+      )
+    )
+
   column_names: '{sql}'
   add_column: alter table {table} add {column} {type}
   alter_columns: alter table {table} alter column {col_ddl}

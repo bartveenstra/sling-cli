@@ -43,3 +43,4 @@ cmd/sling/frontend
 .python-version
 pyproject.toml
 uv.lock
+/.idea/
